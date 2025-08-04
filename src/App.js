@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Analyse from "./pages/Analyse";
 import Design from "./pages/Design";
+import Landing from "./pages/Landing";
 
 function App() {
   return (
@@ -10,7 +11,7 @@ function App() {
       <Navbar />
       <Box sx={{ flexGrow: 1, overflow: "auto" }}>
         <Routes>
-          <Route path="/" element={<Navigate to="/analyse" />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/analyse/*" element={<Analyse />} />
           <Route path="/design" element={<Design />} />
         </Routes>
