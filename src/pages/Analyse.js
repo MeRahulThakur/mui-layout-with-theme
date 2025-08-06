@@ -1,6 +1,9 @@
 // pages/analyse/Analyse.js
 import React, { useState } from "react";
-import { Box, Tabs, Tab, useTheme } from "@mui/material";
+import { Box, Tabs, Tab, Tooltip, useTheme } from "@mui/material";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import TimelineIcon from "@mui/icons-material/Timeline";
 import Charts from "./analyse/Charts";
 import Steps from "./analyse/Steps";
 import TestData from "./analyse/TestData";
@@ -9,9 +12,9 @@ import StepsFilter from "./analyse/filters/StepsFilter";
 import TestDataFilter from "./analyse/filters/TestDataFilter";
 
 const tabOptions = [
-  { label: "Test Data", key: "testData" },
-  { label: "Steps", key: "steps" },
-  { label: "Charts", key: "charts" },
+  { icon: <TableChartIcon />, key: "testData", label: "Test Data" },
+  { icon: <TimelineIcon />, key: "steps", label: "Steps" },
+  { icon: <BarChartIcon />, key: "charts", label: "Charts" },
 ];
 
 function Analyse() {
@@ -88,17 +91,35 @@ function Analyse() {
     >
       {/* Vertical Tabs */}
       <Box
-        sx={{ width: 180, borderRight: `1px solid ${theme.palette.divider}` }}
+        sx={{ width: 100, borderRight: `1px solid ${theme.palette.divider}` }}
       >
         <Tabs
           orientation="vertical"
           value={activeTab}
           onChange={handleTabChange}
           variant="scrollable"
-          sx={{ height: "100%" }}
+          sx={{ height: "100%", alignItems: "center" }}
         >
           {tabOptions.map((tab) => (
-            <Tab key={tab.key} label={tab.label} value={tab.key} />
+            <Tab
+              key={tab.key}
+              value={tab.key}
+              icon={
+                <Tooltip
+                  title={tab.label}
+                  placement="right"
+                  slotProps={{
+                    popper: {
+                      modifiers: [
+                        { name: "offset", options: { offset: [0, 6] } },
+                      ],
+                    },
+                  }}
+                >
+                  <span>{tab.icon}</span>
+                </Tooltip>
+              }
+            />
           ))}
         </Tabs>
       </Box>
