@@ -16,8 +16,8 @@ const tabOptions = [
 
 function Analyse() {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState("testData");
-  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData");
+  const [activeTab, setActiveTab] = useState("testData"); //used for which filters UI to show.
+  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData"); //controls which content stays until the next filter change.
 
   const [filters, setFilters] = useState({
     testData: { keyword: "" },
