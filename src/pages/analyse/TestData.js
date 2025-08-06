@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
+import AnalyseLayout from "./AnalyseLayout";
+import TestDataFilter from "./filters/TestDataFilter";
 import { Typography } from "@mui/material";
 
-function TestData({ filters }) {
+function TestData() {
+  const [filters, setFilters] = useState({ keyword: "" });
+
   return (
-    <>
-      <Typography variant="h6">Test Data Content</Typography>
-      <Typography>Keyword: {filters.keyword}</Typography>
-    </>
+    <AnalyseLayout
+      FilterComponent={
+        <TestDataFilter filters={filters} setFilters={setFilters} />
+      }
+    >
+      <Typography variant="h6">Filtered Content for Test Data</Typography>
+      <p>Keyword filter: {filters.keyword}</p>
+    </AnalyseLayout>
   );
 }
 
