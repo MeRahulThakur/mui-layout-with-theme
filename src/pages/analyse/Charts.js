@@ -3,9 +3,7 @@ import AnalyseLayout from "./AnalyseLayout";
 import ChartsFilter from "./filters/ChartsFilter";
 import { Typography } from "@mui/material";
 
-function Charts() {
-  const [filters, setFilters] = useState({ chartType: "bar" });
-
+function Charts({ filters, setFilters }) {
   return (
     <AnalyseLayout
       FilterComponent={

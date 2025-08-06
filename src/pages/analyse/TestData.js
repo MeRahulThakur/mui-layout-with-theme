@@ -3,9 +3,7 @@ import AnalyseLayout from "./AnalyseLayout";
 import TestDataFilter from "./filters/TestDataFilter";
 import { Typography } from "@mui/material";
 
-function TestData() {
-  const [filters, setFilters] = useState({ keyword: "" });
-
+function TestData({ filters, setFilters }) {
   return (
     <AnalyseLayout
       FilterComponent={

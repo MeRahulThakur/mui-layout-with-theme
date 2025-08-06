@@ -3,9 +3,7 @@ import AnalyseLayout from "./AnalyseLayout";
 import StepsFilter from "./filters/StepsFilter";
 import { Typography } from "@mui/material";
 
-function Steps() {
-  const [filters, setFilters] = useState({ stepType: "" });
-
+function Steps({ filters, setFilters }) {
   return (
     <AnalyseLayout
       FilterComponent={

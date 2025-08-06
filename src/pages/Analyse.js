@@ -10,10 +10,15 @@ import { Tabs, Tab, Box } from "@mui/material";
 import TestData from "./analyse/TestData";
 import Steps from "./analyse/Steps";
 import Charts from "./analyse/Charts";
+import Landing from "./Landing";
 
 function Analyse() {
   const navigate = useNavigate();
   const location = useLocation();
+  // 🔥 Persistent filters for each tab
+  const [testDataFilters, setTestDataFilters] = useState({ keyword: "" });
+  const [stepsFilters, setStepsFilters] = useState({ stepType: "" });
+  const [chartsFilters, setChartsFilters] = useState({ chartType: "bar" });
 
   const tabMap = ["/analyse/test-data", "/analyse/steps", "/analyse/charts"];
   function getCurrentTabValue(pathname) {
@@ -36,10 +41,28 @@ function Analyse() {
       </Tabs>
 
       <Routes>
-        <Route path="test-data" element={<TestData />} />
-        <Route path="steps" element={<Steps />} />
-        <Route path="charts" element={<Charts />} />
-        <Route path="/" element={<TestData />} />
+        <Route
+          path="test-data"
+          element={
+            <TestData
+              filters={testDataFilters}
+              setFilters={setTestDataFilters}
+            />
+          }
+        />
+        <Route
+          path="steps"
+          element={
+            <Steps filters={stepsFilters} setFilters={setStepsFilters} />
+          }
+        />
+        <Route
+          path="charts"
+          element={
+            <Charts filters={chartsFilters} setFilters={setChartsFilters} />
+          }
+        />
+        <Route path="/" element={<Landing />} />
         <Route path="*" element={<Navigate to="/analyse/test-data" />} />{" "}
         {/* Catch-all */}
       </Routes>
