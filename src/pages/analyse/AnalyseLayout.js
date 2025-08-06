@@ -1,10 +1,7 @@
 import React from "react";
-import { Box, Typography, Divider, useTheme } from "@mui/material";
-import TestDataFilter from "./filters/TestDataFilter";
-import StepsFilter from "./filters/StepsFilter";
-import ChartsFilter from "./filters/ChartsFilter";
+import { Box, useTheme } from "@mui/material";
 
-function AnalyseLayout({ filters, children }) {
+function AnalyseLayout({ FilterComponent, children }) {
   const theme = useTheme();
 
   return (
@@ -25,24 +22,7 @@ function AnalyseLayout({ filters, children }) {
           overflowY: "auto",
         }}
       >
-        <Typography variant="subtitle2" gutterBottom>
-          Test Data Filters
-        </Typography>
-        <TestDataFilter {...filters.testData} />
-
-        <Divider sx={{ my: 2 }} />
-
-        <Typography variant="subtitle2" gutterBottom>
-          Steps Filters
-        </Typography>
-        <StepsFilter {...filters.steps} />
-
-        <Divider sx={{ my: 2 }} />
-
-        <Typography variant="subtitle2" gutterBottom>
-          Charts Filters
-        </Typography>
-        <ChartsFilter {...filters.charts} />
+        {FilterComponent}
       </Box>
 
       {/* Main content */}
