@@ -1,4 +1,3 @@
-// pages/analyse/Analyse.js
 import React, { useState } from "react";
 import { Box, Tabs, Tab, Tooltip, useTheme } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -19,8 +18,9 @@ const tabOptions = [
 
 function Analyse() {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState("testData"); //used for which filters UI to show.
-  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData"); //controls which content stays until the next filter change.
+  const [activeTab, setActiveTab] = useState("testData"); // Which filter UI to show
+  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData"); // Which content to show until filter changes
+  const [isFilterVisible, setIsFilterVisible] = useState(true); // Show/hide filters
 
   const [filters, setFilters] = useState({
     testData: { keyword: "" },
@@ -30,6 +30,7 @@ function Analyse() {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setIsFilterVisible(true);
   };
 
   const handleFilterChange = (tabKey, newFilters) => {
@@ -119,23 +120,33 @@ function Analyse() {
                   <span>{tab.icon}</span>
                 </Tooltip>
               }
+              onClick={() => {
+                console.log("Tab onchange", tab.key, activeTab);
+                if (tab.key === activeTab) {
+                  // Clicking the same tab toggles filter visibility
+                  setIsFilterVisible((prev) => !prev);
+                }
+              }}
             />
           ))}
         </Tabs>
       </Box>
 
       {/* Filter Section */}
-      <Box
-        sx={{
-          width: 280,
-          p: 2,
-          borderRight: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
-          overflowY: "auto",
-        }}
-      >
-        {getFilterComponent()}
-      </Box>
+      {isFilterVisible && (
+        <Box
+          sx={{
+            width: 280,
+            p: 2,
+            borderRight: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+            overflowY: "auto",
+            transition: "width 0.3s ease",
+          }}
+        >
+          {getFilterComponent()}
+        </Box>
+      )}
 
       {/* Content Section */}
       <Box
