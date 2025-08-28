@@ -1,86 +1,37 @@
+// pages/Analyse.js
 import React, { useState } from "react";
 import { Box, Tabs, Tab, Tooltip, useTheme } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import TimelineIcon from "@mui/icons-material/Timeline";
-import Charts from "./analyse/Charts";
-import Steps from "./analyse/Steps";
-import TestData from "./analyse/TestData";
-import ChartsFilter from "./analyse/filters/ChartsFilter";
-import StepsFilter from "./analyse/filters/StepsFilter";
-import TestDataFilter from "./analyse/filters/TestDataFilter";
+import { TestData } from "./analyse/TestData";
+import { Steps } from "./analyse/Steps";
+import { Charts } from "./analyse/Charts";
 
 const tabOptions = [
-  { icon: <TableChartIcon />, key: "testData", label: "Test Data" },
-  { icon: <TimelineIcon />, key: "steps", label: "Steps" },
-  { icon: <BarChartIcon />, key: "charts", label: "Charts" },
+  {
+    icon: <TableChartIcon />,
+    key: "testData",
+    label: "Test Data",
+    Module: TestData,
+  },
+  { icon: <TimelineIcon />, key: "steps", label: "Steps", Module: Steps },
+  { icon: <BarChartIcon />, key: "charts", label: "Charts", Module: Charts },
 ];
 
 function Analyse() {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState("testData"); // Which filter UI to show
-  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData"); // Which content to show until filter changes
-  const [isFilterVisible, setIsFilterVisible] = useState(true); // Show/hide filters
-
-  const [filters, setFilters] = useState({
-    testData: { keyword: "" },
-    steps: { stepType: "" },
-    charts: { chartType: "bar" },
-  });
+  const [activeTab, setActiveTab] = useState("testData");
+  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData");
+  const [isFilterVisible, setIsFilterVisible] = useState(true);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
     setIsFilterVisible(true);
+    setLastSubmittedTab(newValue); // ✅ update content when switching tabs
   };
 
-  const handleFilterChange = (tabKey, newFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      [tabKey]: newFilters,
-    }));
-    setLastSubmittedTab(tabKey);
-  };
-
-  const getFilterComponent = () => {
-    switch (activeTab) {
-      case "testData":
-        return (
-          <TestDataFilter
-            filters={filters.testData}
-            setFilters={(newF) => handleFilterChange("testData", newF)}
-          />
-        );
-      case "steps":
-        return (
-          <StepsFilter
-            filters={filters.steps}
-            setFilters={(newF) => handleFilterChange("steps", newF)}
-          />
-        );
-      case "charts":
-        return (
-          <ChartsFilter
-            filters={filters.charts}
-            setFilters={(newF) => handleFilterChange("charts", newF)}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  const getContentComponent = () => {
-    switch (lastSubmittedTab) {
-      case "testData":
-        return <TestData filters={filters.testData} />;
-      case "steps":
-        return <Steps filters={filters.steps} />;
-      case "charts":
-        return <Charts filters={filters.charts} />;
-      default:
-        return null;
-    }
-  };
+  const ActiveTab = tabOptions.find((t) => t.key === activeTab)?.Module;
 
   return (
     <Box
@@ -90,7 +41,7 @@ function Analyse() {
         backgroundColor: theme.palette.background.default,
       }}
     >
-      {/* Vertical Tabs */}
+      {/* Tabs */}
       <Box
         sx={{ width: 100, borderRight: `1px solid ${theme.palette.divider}` }}
       >
@@ -121,44 +72,44 @@ function Analyse() {
                 </Tooltip>
               }
               onClick={() => {
-                console.log("Tab onchange", tab.key, activeTab);
-                if (tab.key === activeTab) {
-                  // Clicking the same tab toggles filter visibility
-                  setIsFilterVisible((prev) => !prev);
-                }
+                if (tab.key === activeTab) setIsFilterVisible((prev) => !prev);
               }}
             />
           ))}
         </Tabs>
       </Box>
 
-      {/* Filter Section */}
-      {isFilterVisible && (
-        <Box
-          sx={{
-            width: 280,
-            p: 2,
-            borderRight: `1px solid ${theme.palette.divider}`,
-            backgroundColor: theme.palette.background.paper,
-            overflowY: "auto",
-            transition: "width 0.3s ease",
-          }}
-        >
-          {getFilterComponent()}
-        </Box>
-      )}
+      {/* Active tab with shared Provider */}
+      {ActiveTab && (
+        <ActiveTab.Provider>
+          {/* Filter Pane */}
+          {isFilterVisible && ActiveTab.Filter && (
+            <Box
+              sx={{
+                width: 280,
+                p: 2,
+                borderRight: `1px solid ${theme.palette.divider}`,
+                backgroundColor: theme.palette.background.paper,
+                overflowY: "auto",
+              }}
+            >
+              <ActiveTab.Filter />
+            </Box>
+          )}
 
-      {/* Content Section */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          p: 2,
-          overflowY: "auto",
-          color: theme.palette.text.primary,
-        }}
-      >
-        {getContentComponent()}
-      </Box>
+          {/* Content */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              p: 2,
+              overflowY: "auto",
+              color: theme.palette.text.primary,
+            }}
+          >
+            <ActiveTab.Content />
+          </Box>
+        </ActiveTab.Provider>
+      )}
     </Box>
   );
 }
