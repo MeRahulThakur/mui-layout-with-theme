@@ -1,20 +1,22 @@
-import React, { useState, createContext, useContext } from "react";
-import { Typography, TextField } from "@mui/material";
+import React, { createContext, useContext, useState } from "react";
+import { Box, TextField, Typography } from "@mui/material";
 
-// Context for filters internal to TestData
-const TestDataContext = createContext();
+const Ctx = createContext(null);
 
-export function TestDataProvider({ children }) {
+function Provider({ children }) {
   const [filters, setFilters] = useState({ keyword: "" });
-  return (
-    <TestDataContext.Provider value={{ filters, setFilters }}>
-      {children}
-    </TestDataContext.Provider>
-  );
+  const value = { filters, setFilters };
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-export function TestDataFilter() {
-  const { filters, setFilters } = useContext(TestDataContext);
+function useTestData() {
+  const ctx = useContext(Ctx);
+  if (!ctx) throw new Error("TestData must be used within its Provider");
+  return ctx;
+}
+
+function Filter({ onSubmit }) {
+  const { filters, setFilters } = useTestData();
   return (
     <TextField
       fullWidth
@@ -23,13 +25,16 @@ export function TestDataFilter() {
       size="small"
       margin="dense"
       value={filters.keyword}
-      onChange={(e) => setFilters({ keyword: e.target.value })}
+      onChange={(e) => {
+        setFilters({ ...filters, keyword: e.target.value });
+        if (onSubmit) onSubmit();
+      }}
     />
   );
 }
 
-export function TestDataContent() {
-  const { filters } = useContext(TestDataContext);
+function Content() {
+  const { filters } = useTestData();
   return (
     <>
       <Typography variant="h6">Filtered Content for Test Data</Typography>
@@ -38,9 +43,40 @@ export function TestDataContent() {
   );
 }
 
-// Bundle for Analyse
-export const TestData = {
-  Provider: TestDataProvider,
-  Filter: TestDataFilter,
-  Content: TestDataContent,
-};
+/**
+ * Default export: one component that knows how to render itself
+ * into the Analyse layout slots using grid areas.
+ */
+export default function TestData({ showFilter, showContent, onSubmit }) {
+  if (!showFilter && !showContent) return null;
+
+  return (
+    <Provider>
+      {showFilter && (
+        <Box
+          sx={{
+            gridArea: "filter",
+            p: 2,
+            borderRight: (t) => `1px solid ${t.palette.divider}`,
+            bgcolor: "background.paper",
+            overflowY: "auto",
+          }}
+        >
+          <Filter onSubmit={onSubmit} />
+        </Box>
+      )}
+      {showContent && (
+        <Box
+          sx={{
+            gridArea: "content",
+            p: 2,
+            overflowY: "auto",
+            color: "text.primary",
+          }}
+        >
+          <Content />
+        </Box>
+      )}
+    </Provider>
+  );
+}

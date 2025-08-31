@@ -1,47 +1,54 @@
-// pages/Analyse.js
 import React, { useState } from "react";
 import { Box, Tabs, Tab, Tooltip, useTheme } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import TimelineIcon from "@mui/icons-material/Timeline";
-import { TestData } from "./analyse/TestData";
-import { Steps } from "./analyse/Steps";
-import { Charts } from "./analyse/Charts";
 
-const tabOptions = [
+import TestData from "./analyse/TestData/index";
+import Steps from "./analyse/Steps/index";
+import Charts from "./analyse/Charts/index";
+
+const tabs = [
   {
-    icon: <TableChartIcon />,
     key: "testData",
     label: "Test Data",
+    icon: <TableChartIcon />,
     Module: TestData,
   },
-  { icon: <TimelineIcon />, key: "steps", label: "Steps", Module: Steps },
-  { icon: <BarChartIcon />, key: "charts", label: "Charts", Module: Charts },
+  { key: "steps", label: "Steps", icon: <TimelineIcon />, Module: Steps },
+  { key: "charts", label: "Charts", icon: <BarChartIcon />, Module: Charts },
 ];
 
-function Analyse() {
+export default function Analyse() {
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState("testData");
-  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData");
-  const [isFilterVisible, setIsFilterVisible] = useState(true);
+  const [activeTab, setActiveTab] = useState("testData"); // which filter UI is visible
+  const [lastSubmittedTab, setLastSubmittedTab] = useState("testData"); // which content is shown
+  const [isFilterVisible, setIsFilterVisible] = useState(true); // VS Code-style toggle
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-    setIsFilterVisible(true);
-    setLastSubmittedTab(newValue); // ✅ update content when switching tabs
+  const handleTabChange = (_e, newValue) => {
+    if (newValue !== activeTab) {
+      // switched tab → always show filter
+      setActiveTab(newValue);
+      setIsFilterVisible(true);
+    }
   };
 
-  const ActiveTab = tabOptions.find((t) => t.key === activeTab)?.Module;
+  const handleTabClick = (key) => {
+    if (key === activeTab) {
+      // same tab → toggle filter visibility
+      setIsFilterVisible((v) => !v);
+    }
+  };
 
   return (
     <Box
       sx={{
         display: "flex",
         height: "100%",
-        backgroundColor: theme.palette.background.default,
+        bgColor: theme.palette.background.default,
       }}
     >
-      {/* Tabs */}
+      {/* Vertical Tabs */}
       <Box
         sx={{ width: 100, borderRight: `1px solid ${theme.palette.divider}` }}
       >
@@ -50,68 +57,63 @@ function Analyse() {
           value={activeTab}
           onChange={handleTabChange}
           variant="scrollable"
-          sx={{ height: "100%", alignItems: "center" }}
+          // slotProps={{
+          //   indicator: { sx: { left: 0, width: 4, bgcolor: "primary.main" } },
+          // }}
+          sx={{
+            height: "100%",
+            alignItems: "center",
+            // "& .MuiTab-root": {
+            //   minWidth: 0,
+            //   padding: "12px 0",
+            // },
+            // // selected tab background
+            // "& .MuiTab-root.Mui-selected": {
+            //   backgroundColor: "green",
+            // },
+          }}
         >
-          {tabOptions.map((tab) => (
-            <Tab
-              key={tab.key}
-              value={tab.key}
-              icon={
-                <Tooltip
-                  title={tab.label}
-                  placement="right"
-                  slotProps={{
-                    popper: {
-                      modifiers: [
-                        { name: "offset", options: { offset: [0, 6] } },
-                      ],
-                    },
-                  }}
-                >
-                  <span>{tab.icon}</span>
-                </Tooltip>
-              }
-              onClick={() => {
-                if (tab.key === activeTab) setIsFilterVisible((prev) => !prev);
+          {tabs.map(({ key, label, icon }) => (
+            <Tooltip
+              key={key}
+              title={label}
+              placement="right"
+              slotProps={{
+                popper: {
+                  modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
+                },
               }}
-            />
+            >
+              <Tab
+                value={key}
+                icon={icon}
+                onClick={() => handleTabClick(key)}
+              />
+            </Tooltip>
           ))}
         </Tabs>
       </Box>
 
-      {/* Active tab with shared Provider */}
-      {ActiveTab && (
-        <ActiveTab.Provider>
-          {/* Filter Pane */}
-          {isFilterVisible && ActiveTab.Filter && (
-            <Box
-              sx={{
-                width: 280,
-                p: 2,
-                borderRight: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.background.paper,
-                overflowY: "auto",
-              }}
-            >
-              <ActiveTab.Filter />
-            </Box>
-          )}
-
-          {/* Content */}
-          <Box
-            sx={{
-              flexGrow: 1,
-              p: 2,
-              overflowY: "auto",
-              color: theme.palette.text.primary,
-            }}
-          >
-            <ActiveTab.Content />
-          </Box>
-        </ActiveTab.Provider>
-      )}
+      {/* Two fixed slots via CSS Grid: left filter, right content */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: isFilterVisible ? "280px 1fr" : "1fr",
+          gridTemplateAreas: isFilterVisible ? `"filter content"` : `"content"`,
+          flexGrow: 1,
+          minWidth: 0, // fix overflow in flex/grid
+        }}
+      >
+        {/* Mount all modules; only the chosen ones render into slots */}
+        {tabs.map(({ key, Module }) => (
+          <Module
+            key={key}
+            showFilter={isFilterVisible && activeTab === key}
+            showContent={lastSubmittedTab === key}
+            onSubmit={() => setLastSubmittedTab(key)}
+          />
+        ))}
+      </Box>
     </Box>
   );
 }
-
-export default Analyse;
