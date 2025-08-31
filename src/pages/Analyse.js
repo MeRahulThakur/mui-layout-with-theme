@@ -57,39 +57,35 @@ export default function Analyse() {
           value={activeTab}
           onChange={handleTabChange}
           variant="scrollable"
-          // slotProps={{
-          //   indicator: { sx: { left: 0, width: 4, bgcolor: "primary.main" } },
-          // }}
+          slotProps={{
+            indicator: { sx: { left: 0, width: 4, bgcolor: "primary.main" } },
+          }}
           sx={{
             height: "100%",
             alignItems: "center",
-            // "& .MuiTab-root": {
-            //   minWidth: 0,
-            //   padding: "12px 0",
-            // },
-            // // selected tab background
-            // "& .MuiTab-root.Mui-selected": {
-            //   backgroundColor: "green",
-            // },
           }}
         >
           {tabs.map(({ key, label, icon }) => (
-            <Tooltip
+            <Tab
               key={key}
-              title={label}
-              placement="right"
-              slotProps={{
-                popper: {
-                  modifiers: [{ name: "offset", options: { offset: [0, 6] } }],
-                },
-              }}
-            >
-              <Tab
-                value={key}
-                icon={icon}
-                onClick={() => handleTabClick(key)}
-              />
-            </Tooltip>
+              value={key}
+              icon={
+                <Tooltip
+                  title={label}
+                  placement="right"
+                  slotProps={{
+                    popper: {
+                      modifiers: [
+                        { name: "offset", options: { offset: [0, 6] } },
+                      ],
+                    },
+                  }}
+                >
+                  <span>{icon}</span>
+                </Tooltip>
+              }
+              onClick={() => handleTabClick(key)}
+            />
           ))}
         </Tabs>
       </Box>
